@@ -37,10 +37,6 @@ const loadDomainTlsInfo = (domain) => {
         (err) => {
           assert(socket.authorized);
           const {
-            subject,
-            issuer,
-            subjectaltname,
-            infoAccess,
             valid_from,
             valid_to,
           } = socket.getPeerCertificate();

@@ -1,9 +1,10 @@
 import {
   openDB,
-  deleteDB,
-  wrap,
-  unwrap,
 } from "https://cdn.jsdelivr.net/npm/idb@7/+esm";
+
+export const loadDomainInfo = (domain) => fetch(
+  `/api/Domain/tlsInfo?domain=${domain}`
+).then((ret) => ret.json());
 
 const DB_NAME = "TLS_DASHBOARD";
 const STORE_NAME = "DOMAIN";

@@ -7,6 +7,8 @@ let dbPromise
 
 let index = 0
 
+const sleep = timeout => new Promise(resolve => setTimeout(resolve, timeout))
+
 self.addEventListener('periodicsync', event => {
   checkDomainsTls()
 })
@@ -23,7 +25,7 @@ const checkDomainsTls = async () => {
     } catch (err) {
       console.error(err)
     }
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await sleep(100)
   }, Promise.resolve([]))
   list = await db.getAll(STORE_NAME)
   const notifyList = list.filter(
@@ -37,12 +39,12 @@ const checkDomainsTls = async () => {
       icon: '/favicon.ico',
       body: `${notifyList.map(
         d => `${d.domain}  ${new Date(d.validTo).toLocaleDateString()}`).join('\n')
-      }`
+        }`
     })
   }
 }
 
-const init= async () => {
+const init = async () => {
   self.importScripts(`${CDN_URL}/npm/idb@7.0.1/build/umd.js`)
   dbPromise = self.idb.openDB(DB_NAME, 1, {
     upgrade(db) {
@@ -92,7 +94,7 @@ const init= async () => {
       cacheName: 'static-assets-cache-' + version,
     })
   )
-    registerRoute(
+  registerRoute(
     /\.(?:png|jpg|jpeg|svg|gif|ico)$/,
     new CacheFirst({
       cacheName: 'img-v1',

@@ -5,8 +5,6 @@ if ('serviceWorker' in navigator) {
     if (registration.periodicSync) {
       Notification.requestPermission()
       const status = await navigator.permissions.query({name: 'periodic-background-sync'});
-      const tags = await registration.periodicSync.getTags();
-      await registration.periodicSync.unregister('get-daily-news');
       if (status.state === 'granted') {
         await registration.periodicSync.register('sync-domains', {
           minInterval: 24 * 60 * 60 * 1000
