@@ -13,6 +13,13 @@ self.addEventListener('periodicsync', event => {
   checkDomainsTls()
 })
 
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(
+    self.clients.openWindow(`${self.location.origin}`),
+  );
+}, false);
+
 const checkDomainsTls = async () => {
   const db = await dbPromise
   let list = await db.getAll(STORE_NAME)
