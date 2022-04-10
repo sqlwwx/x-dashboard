@@ -8,7 +8,6 @@ import { loadDomainList, saveDomain, removeDomain } from './services.js'
 
 const ENTER_KEY = 13;
 
-
 const loadDomainInfo = (domain) =>
   fetch(`/api/Domain/tlsInfo?domain=${domain}`).then((ret) => ret.json());
 

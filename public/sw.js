@@ -13,13 +13,33 @@ self.addEventListener('periodicsync', event => {
 
 const checkDomainsTls = async () => {
   const db = await dbPromise
-  const list = await db.getAll(STORE_NAME)
-  self.registration.showNotification(`test ${index += 1}`, {
-    tag: 'test',
-    data: { time: Date.now() },
-    requireInteraction: true,
-    body: `test: ${new Date()}`
-  })
+  let list = await db.getAll(STORE_NAME)
+  await list.reduce(async (promise, { domain }) => {
+    await promise
+    try {
+      const info = await fetch(`/api/Domain/tlsInfo?domain=${domain}`)
+        .then((ret) => ret.json());
+      await db.put(STORE_NAME, info);
+    } catch (err) {
+      console.error(err)
+    }
+    await new Promise(resolve => setTimeout(resolve, 1000))
+  }, Promise.resolve([]))
+  list = await db.getAll(STORE_NAME)
+  const notifyList = list.filter(
+    d => d.validTo < (Date.now() + 30 * 24 * 60 * 60 * 1000)
+  )
+  if (notifyList.length) {
+    self.registration.showNotification(`域名即将过期提醒`, {
+      tag: notifyList.map(d => d.domain).join('-'),
+      data: { time: Date.now() },
+      requireInteraction: true,
+      icon: '/favicon.ico',
+      body: `${notifyList.map(
+        d => `${d.domain}  ${new Date(d.validTo).toLocaleDateString()}`).join('\n')
+      }`
+    })
+  }
 }
 
 const init= async () => {
