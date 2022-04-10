@@ -1,0 +1,30 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>x-dashboard</title>
+    <script
+      src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"
+    ></script>
+  </head>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/nprogress/nprogress.min.js"></script>
+    <script>
+      NProgress.start()
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('sw.js').finally(() => {
+            NProgress.done()
+          })
+        })
+      }
+    </script>
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/eruda/eruda.js"></script>
+    <script>eruda.init();</script>
+    -->
+    <script type="module" src="index.js"></script>
+  </body>
+</html>
