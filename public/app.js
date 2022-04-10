@@ -3,13 +3,27 @@ import {
   useState,
   useEffect,
   render,
-} from "https://cdn.jsdelivr.net/npm/htm/preact/standalone.module.js";
-import { loadDomainList, saveDomain, removeDomain } from './services.js'
+} from "https://cdn.jsdelivr.net/npm/htm/preact/standalone.module.js"
 
-const ENTER_KEY = 13;
+import { loadDomainList, loadDomainInfo, saveDomain, removeDomain } from './services.js'
 
-const loadDomainInfo = (domain) =>
-  fetch(`/api/Domain/tlsInfo?domain=${domain}`).then((ret) => ret.json());
+const ONE_DAY = 24 * 60 * 60 * 1000
+const ENTER_KEY = 13
+
+const getBgColor = (domainInfo) => {
+  const { validTo } = domainInfo
+  if (!validTo) {
+    return ''
+  }
+  const days = Math.round((validTo - Date.now()) / ONE_DAY)
+  if (days > 60) {
+    return `bg-green-${Math.round(days / 60) * 100}`
+  }
+  if (days > 30) {
+    return `bg-yellow-${Math.round(days/30) * 100}`
+  }
+  return `bg-red-${Math.round(days / 10) * 100}`
+}
 
 const App = () => {
   const [domainList, setDomainList] = useState([]);
@@ -60,7 +74,7 @@ const App = () => {
           />
         </svg>
         <input
-          class="focus:border-light-blue-500 focus:ring-1 focus:ring-light-blue-500 focus:outline-none w-full text-sm text-black placeholder-gray-500 border border-gray-200 rounded-md py-2 pl-10"
+          class="focus:border-light-blue-500 focus:ring-1 focus:ring-light-blue-500 focus:outline-none w-full text-sm text-black placeholder-gray-500 border border-transparent border-gray-200 rounded-md py-2 pl-10"
           type="text"
           aria-label="Filter domains"
           placeholder="搜索域名"
@@ -86,22 +100,22 @@ const App = () => {
             (domainInfo, index) => html`
               <li
                 key=${domainInfo.domain}
-                class="group block rounded-lg p-4 border border-gray-200"
+                class="${
+                  getBgColor(domainInfo)
+                } group block rounded-lg p-4 border border-gray-200"
               >
                 <h1>${domainInfo.domain}</h1>
                 <h3>
-                  过期时间：${domainInfo.validTo
-                    ? new Date(domainInfo.validTo).toLocaleString()
-                    : "-"}
+                  过期时间：${
+                    new Date(domainInfo.validTo).toLocaleString()
+                  } (${Math.round((domainInfo.validTo - Date.now()) / ONE_DAY)})
                 </h3>
                 <h3>
                   同步时间：${domainInfo.timestamp
                     ? new Date(domainInfo.timestamp).toLocaleString()
                     : "-"}
                 </h3>
-                <div class="flex px-4 py-4 space-x-4 overflow-x-auto bg-white rounded-md justify-end">
-                  <div>
-                  </div>
+                <div class="flex px-4 py-4 space-x-4 overflow-x-auto rounded-md justify-end">
                   <button
                     onClick=${() => {
                       loadDomainInfo(domainInfo.domain).then((info) => {
@@ -120,7 +134,7 @@ const App = () => {
                     <span class="mx-1">刷新</span>
                   </button>
                   <button
-                    class="px-4 py-2 text-red-200 bg-red-500 rounded-md hover:bg-red-400 focus:outline-none focus:bg-red-400"
+                    class="px-4 py-2 text-white bg-red-500 hover:bg-red-700 rounded-md focus:outline-none"
                     onClick=${() => {
                       setDomainList((list) => {
                         const result = list.filter(
