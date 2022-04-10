@@ -77,10 +77,15 @@ const App = () => {
           class="focus:border-light-blue-500 focus:ring-1 focus:ring-light-blue-500 focus:outline-none w-full text-sm text-black placeholder-gray-500 border border-transparent border-gray-200 rounded-md py-2 pl-10"
           type="text"
           aria-label="Filter domains"
-          placeholder="搜索域名"
+          placeholder="搜索域名,按回车添加域名"
           value=${domainInputValue}
           onInput=${(e) => {
-            setDomainInputValue(e.target.value);
+            const { target: { value } } = e
+            if (value && value.includes('://')) {
+              setDomainInputValue(value.split('://')[1].split('/')[0]);
+            } else {
+              setDomainInputValue(value);
+            }
           }}
           onKeyDown=${(e) => {
             if (e.which === ENTER_KEY) {
