@@ -1,4 +1,4 @@
-import './app.js'
+import './app.mjs'
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.ready.then(async registration => {
@@ -13,7 +13,7 @@ if ('serviceWorker' in navigator) {
     }
   })
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
+    navigator.serviceWorker.register('sw.mjs')
       .then((registration) => {
         console.log(registration)
         var serviceWorker;

@@ -1,29 +1,31 @@
+import { html, useState, useEffect, render } from "preact";
+
 import {
-  html,
-  useState,
-  useEffect,
-  render,
-} from "https://cdn.jsdelivr.net/npm/htm/preact/standalone.module.js"
+  loadDomainList,
+  loadDomainInfo,
+  saveDomain,
+  removeDomain,
+  exportCsv,
+  importCsv,
+} from "./services.mjs";
 
-import { loadDomainList, loadDomainInfo, saveDomain, removeDomain } from './services.js'
-
-const ONE_DAY = 24 * 60 * 60 * 1000
-const ENTER_KEY = 13
+const ONE_DAY = 24 * 60 * 60 * 1000;
+const ENTER_KEY = 13;
 
 const getBgColor = (domainInfo) => {
-  const { validTo } = domainInfo
+  const { validTo } = domainInfo;
   if (!validTo) {
-    return ''
+    return "";
   }
-  const days = Math.round((validTo - Date.now()) / ONE_DAY)
+  const days = Math.round((validTo - Date.now()) / ONE_DAY);
   if (days > 60) {
-    return `bg-green-${Math.round(days / 60) * 100}`
+    return `bg-green-${Math.round(days / 60) * 100}`;
   }
   if (days > 30) {
-    return `bg-yellow-${Math.round(days/30) * 100}`
+    return `bg-yellow-${Math.round(days / 30) * 100}`;
   }
-  return `bg-red-${Math.round(days / 10) * 100}`
-}
+  return `bg-red-${Math.round(days / 10) * 100}`;
+};
 
 const App = () => {
   const [domainList, setDomainList] = useState([]);
@@ -46,7 +48,7 @@ const App = () => {
       loadDomainInfo(domainInputValue).then((info) => {
         setDomainList((list) => {
           const result = list.concat(info);
-          saveDomain(info)
+          saveDomain(info);
           return result;
         });
       });
@@ -80,9 +82,11 @@ const App = () => {
           placeholder="搜索域名,按回车添加域名"
           value=${domainInputValue}
           onInput=${(e) => {
-            const { target: { value } } = e
-            if (value && value.includes('://')) {
-              setDomainInputValue(value.split('://')[1].split('/')[0]);
+            const {
+              target: { value },
+            } = e;
+            if (value && value.includes("://")) {
+              setDomainInputValue(value.split("://")[1].split("/")[0]);
             } else {
               setDomainInputValue(value);
             }
@@ -100,31 +104,33 @@ const App = () => {
         ${domainList
           .filter(
             (v) => !domainInputValue || v.domain.includes(domainInputValue)
-          ).sort((a, b) => a.validTo - b.validTo)
+          )
+          .sort((a, b) => a.validTo - b.validTo)
           .map(
-            (domainInfo, index) => html`
+            (domainInfo) => html`
               <li
                 key=${domainInfo.domain}
-                class="${
-                  getBgColor(domainInfo)
-                } group block rounded-lg p-4 border border-gray-200"
+                class="${getBgColor(
+                  domainInfo
+                )} group block rounded-lg p-4 border border-gray-200"
               >
                 <h1>${domainInfo.domain}</h1>
                 <h3>
-                  过期时间：${
-                    new Date(domainInfo.validTo).toLocaleString()
-                  } (${Math.round((domainInfo.validTo - Date.now()) / ONE_DAY)})
+                  过期时间：${new Date(domainInfo.validTo).toLocaleString()}
+                  (${Math.round((domainInfo.validTo - Date.now()) / ONE_DAY)})
                 </h3>
                 <h3>
                   同步时间：${domainInfo.timestamp
                     ? new Date(domainInfo.timestamp).toLocaleString()
                     : "-"}
                 </h3>
-                <div class="flex px-4 py-4 space-x-4 overflow-x-auto rounded-md justify-end">
+                <div
+                  class="flex px-4 py-4 space-x-4 overflow-x-auto rounded-md justify-end"
+                >
                   <button
                     onClick=${() => {
                       loadDomainInfo(domainInfo.domain).then((info) => {
-                        saveDomain(info)
+                        saveDomain(info);
                         const result = domainList.map((d) => {
                           if (d.domain === info.domain) {
                             return info;
@@ -134,8 +140,20 @@ const App = () => {
                         setDomainList(result);
                       });
                     }}
-                    class="flex items-center px-2 py-2 font-medium tracking-wide text-white capitalize transition-colors duration-200 transform bg-indigo-600 rounded-md hover:bg-indigo-500 focus:outline-none focus:bg-indigo-500">
-                    <svg class="w-5 h-5 mx-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path></svg>
+                    class="flex items-center px-2 py-2 font-medium tracking-wide text-white capitalize transition-colors duration-200 transform bg-indigo-600 rounded-md hover:bg-indigo-500 focus:outline-none focus:bg-indigo-500"
+                  >
+                    <svg
+                      class="w-5 h-5 mx-1"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
+                        clip-rule="evenodd"
+                      ></path>
+                    </svg>
                     <span class="mx-1">刷新</span>
                   </button>
                   <button
@@ -145,7 +163,7 @@ const App = () => {
                         const result = list.filter(
                           ({ domain }) => domain !== domainInfo.domain
                         );
-                        removeDomain(domainInfo.domain)
+                        removeDomain(domainInfo.domain);
                         return result;
                       });
                     }}
@@ -157,6 +175,20 @@ const App = () => {
             `
           )}
       </ul>
+      <div class="flex">
+        <button
+          onClick=${() => exportCsv()}
+          class="flex items-center px-2 py-2 font-medium tracking-wide text-white capitalize transition-colors duration-200 transform bg-indigo-600 rounded-md hover:bg-indigo-500 focus:outline-none focus:bg-indigo-500 mr-2"
+        >
+          <span class="mx-1">导出</span>
+        </button>
+        <button
+          onClick=${() => importCsv()}
+          class="flex items-center px-2 py-2 font-medium tracking-wide text-white capitalize transition-colors duration-200 transform bg-indigo-600 rounded-md hover:bg-indigo-500 focus:outline-none focus:bg-indigo-500"
+        >
+          <span class="mx-1">导入</span>
+        </button>
+      </div>
     </section>
   `;
 };

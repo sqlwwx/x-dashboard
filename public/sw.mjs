@@ -26,7 +26,7 @@ const checkDomainsTls = async () => {
   await list.reduce(async (promise, { domain }) => {
     await promise
     try {
-      const info = await fetch(`/api/Domain/tlsInfo?domain=${domain}`)
+      const info = await fetch(`api/Domain/tlsInfo?domain=${domain}`)
         .then((ret) => ret.json());
       await db.put(STORE_NAME, info);
     } catch (err) {
@@ -82,7 +82,6 @@ const init = async () => {
   const {
     routing: { registerRoute },
     strategies: {
-      NetworkOnly, CacheOnly,
       NetworkFirst,
       CacheFirst,
       StaleWhileRevalidate
