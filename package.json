@@ -7,11 +7,11 @@
     "start": "node server.mjs"
   },
   "dependencies": {
-    "fastify": "^3.28.0",
-    "fastify-static": "^4.6.1"
+    "@fastify/static": "^8.0.2",
+    "fastify": "^3.29.5"
   },
   "engines": {
-    "node": "16.x"
+    "node": "22.x"
   },
   "license": "MIT",
   "keywords": [

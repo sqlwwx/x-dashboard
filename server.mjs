@@ -2,7 +2,7 @@ import path from 'path'
 import tls from 'tls'
 import assert from 'assert'
 import Fastify from 'fastify'
-import fastifyStatic from 'fastify-static'
+import fastifyStatic from '@fastify/static'
 
 const __dirname = path.parse(new URL(import.meta.url).pathname).dir
 
@@ -76,4 +76,16 @@ fastify.listen(process.env.PORT, "0.0.0.0", function (err, address) {
   }
   console.log(`Your app is listening on ${address}`);
   fastify.log.info(`server listening on ${address}`);
+});
+
+const close = async (signal) => {
+  fastify.log.info(`${signal} received, shutting down`);
+  await fastify.close()
+  fastify.log.info('fastify closed');
+}
+
+['SIGTERM', 'SIGINT'].forEach((signal) => {
+  process.on(signal, () => {
+    close()
+  });
 });
