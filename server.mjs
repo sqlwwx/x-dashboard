@@ -69,14 +69,20 @@ fastify.get("/api/Domain/tlsInfo", async function (request, reply) {
   reply.send(await loadDomainTlsInfo(domain || SERVER_DOMAIN));
 });
 
-fastify.listen(process.env.PORT, "0.0.0.0", function (err, address) {
-  if (err) {
-    fastify.log.error(err);
-    process.exit(1);
+const start = async () => {
+  try {
+    await fastify.listen({
+      host: '0.0.0.0',
+      port: parseInt(process.env.PORT, 10)
+    })
+    console.log(`Your app is listening on ${process.env.PORT}`);
+    fastify.log.info(`server listening on ${process.env.PORT}`);
+  } catch (err) {
+    console.error(err)
+    fastify.log.error(err)
+    process.exit(1)
   }
-  console.log(`Your app is listening on ${address}`);
-  fastify.log.info(`server listening on ${address}`);
-});
+}
 
 const close = async (signal) => {
   fastify.log.info(`${signal} received, shutting down`);
@@ -89,3 +95,5 @@ const close = async (signal) => {
     close()
   });
 });
+
+start()
